@@ -14,6 +14,7 @@ from collections import deque
 
 ###############################################################################
 # hyperparams
+EPISODES = 300
 GAMMA = .99
 TAU = 1e-3
 LR_ACTOR = 1e-3
@@ -88,16 +89,16 @@ def train_agent(agent,env,brain_name,n_episodes=300, batch_size = BATCH_SIZE, fi
             env_info = env.step(action)[brain_name]           # send all actions to the environment
             next_state = env_info.vector_observations         # get next state (for each agent)
             reward = env_info.rewards                         # get reward (for each agent)
-            done = env_info.local_done                        # see if episode finished            
+            done = env_info.local_done                        # see if episode finished
             # record trajectory
             agent.step(state,action,reward,next_state,done, batch_size)
             # update score
-            score += np.mean(env_info.rewards)               
+            score += np.mean(env_info.rewards)
             #check if finished
-            if np.any(done):                                 
+            if np.any(done):
                 break
             else:
-                state = next_state                              
+                state = next_state
 
         # Update monitorization variables & params for next Episode
         scores.append(score)
@@ -123,7 +124,7 @@ if __name__ == "__main__":
                   SEED,GAMMA,TAU,LR_ACTOR,LR_CRITIC, \
                       BUFFER_SIZE, BUFFER_TYPE, POLICY_UPDATE)
     # train
-    scores, checkpoint = train_agent(agent,env,brain_name,n_episodes=150, batch_size = BATCH_SIZE)
+    scores, checkpoint = train_agent(agent,env,brain_name,n_episodes=EPISODES, batch_size = BATCH_SIZE)
     # close env
     env.close()
     # export data
