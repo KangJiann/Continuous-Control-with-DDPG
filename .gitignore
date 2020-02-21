@@ -1,5 +1,6 @@
 *.zip
 Crawler.ipynb
+Reacher_Linux*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
