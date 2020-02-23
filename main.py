@@ -14,7 +14,7 @@ from collections import deque
 
 ###############################################################################
 # hyperparams
-EPISODES = 300
+EPISODES = 1
 GAMMA = .99
 TAU = 1e-3
 LR_ACTOR = 1e-3
@@ -28,8 +28,8 @@ SEED = 0
 # path = 'Reacher_Linux_20agents/Reacher.x86_64'
 path = 'Reacher_Linux_20agents/Reacher.x86_64'
 algorithm = 'DDPG'
-mode = 'train'
-results_filename = 'scores/twenty_agents/scores_' + algorithm + '_batch64_policydelayed_' + mode
+mode = 'evaluation'
+results_filename = 'scores/twenty_agents/scores_' + algorithm + '_batch64_' + mode
 ###############################################################################
 
 def defineEnvironment(path,verbose=False):
@@ -111,9 +111,39 @@ def train_agent(agent,env,brain_name,n_episodes=300, batch_size = BATCH_SIZE, fi
             aux = False
 
     # save the model weights
-    torch.save(agent.actor.state_dict(), 'weights/twenty_agents/actor_batch64_per_'+ filename)
-    torch.save(agent.critic.state_dict(), 'weights/twenty_agents/crtic_batch64_per_'+ filename)
+    torch.save(agent.actor.state_dict(), 'weights/twenty_agents/actor_batch64_'+ filename)
+    torch.save(agent.critic.state_dict(), 'weights/twenty_agents/crtic_batch64_'+ filename)
     return scores,checkpoint
+
+def evaluate_agent(agent,env,brain_name,n_episodes=100):
+    scores = []
+    # ------------------- begin training ------------------- #
+    for e in range(1,n_episodes+1):
+        # --- New Episode --- #
+        # reset the environment
+        env_info = env.reset(train_mode=True)[brain_name]
+        # get the current state
+        state = env_info.vector_observations
+        score = 0
+        # --- Visits --- #
+        while True:
+            # Agent selects an action
+            action = agent.select_action_evaluation(state)
+            # get reward & next_states
+            env_info = env.step(action)[brain_name]           # send all actions to the environment
+            next_state = env_info.vector_observations         # get next state (for each agent)
+            reward = env_info.rewards                         # get reward (for each agent)
+            done = env_info.local_done                        # see if episode finished
+            # Update monitorization variables & params for next visit
+            score += np.mean(env_info.rewards)
+            if np.any(done):
+                break
+            else:
+                state = next_state
+        # Update monitorization variables & params for next Episode
+        scores.append(score)
+        print('Episode/Test {} throws an avg of {}'.format(e,score))
+    return scores
 
 if __name__ == "__main__":
     # set environment and get state & action size
@@ -123,10 +153,18 @@ if __name__ == "__main__":
     agent = Agent(state_size,action_size,num_agents, \
                   SEED,GAMMA,TAU,LR_ACTOR,LR_CRITIC, \
                       BUFFER_SIZE, BUFFER_TYPE, POLICY_UPDATE)
-    # train
-    scores, checkpoint = train_agent(agent,env,brain_name,n_episodes=EPISODES, batch_size = BATCH_SIZE)
+    if mode == 'train':
+        # train
+        scores, checkpoint = train_agent(agent,env,brain_name,n_episodes=EPISODES, batch_size = BATCH_SIZE)
+        # export data
+        with open(results_filename,'wb') as f:
+            pickle.dump([scores,checkpoint],f)
+    elif mode == 'evaluation':
+        weights_filename = 'weights/twenty_agents/actor_batch64_model_weights.pth'
+        agent.actor.load_state_dict(torch.load(weights_filename))
+        agent.actor.eval()
+        scores = evaluate_agent(agent,env,brain_name,n_episodes=EPISODES)
+        checkpoint = None
     # close env
     env.close()
-    # export data
-    with open(results_filename,'wb') as f:
-        pickle.dump([scores,checkpoint],f)
+        

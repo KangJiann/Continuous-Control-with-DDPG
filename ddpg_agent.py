@@ -43,6 +43,9 @@ class Agent():
     def select_action(self, state):
         return self.normal_noise.select_action(self.actor, state)
 
+    def select_action_evaluation(self,state):
+        return self.actor(state).cpu().detach().data.numpy().squeeze()
+    
     def _critic_error(self, state, action, reward, next_state, done):
         done = int(done)
         reward = float(reward)
