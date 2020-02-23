@@ -103,6 +103,6 @@ Before running code in a notebook, change the kernel to match the `drlnd` enviro
 ## Instructions
 Follow the instructions in `Continuous_Control.ipynb` to get started with training your own agent!
   
-The code is prepared to run it either with 1 agent or 20 agents, as the mode in which the experience tuples are collected is different in both cases. Furthermore, it has been coded one of the variants of Prioritized Experience Replay (PER) and one of the parts of the well known TD3 algorithm (which could be seen as an evolved DDPG)
+The code is prepared to run it either with 1 agent or 20 agents, as the mode in which the experience tuples are collected is different in both cases. Furthermore, it has been coded one of the variants of Prioritized Experience Replay (thanks https://github.com/rlcode/per) and one of the parts of the well known TD3 algorithm (which could be seen as an evolved DDPG)
   
 In the `DRLND_P2_Report.pdf` you will find information about the implementation and the obtained results. Check it out and try it yourself!
