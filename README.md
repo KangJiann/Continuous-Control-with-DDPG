@@ -4,7 +4,7 @@
 [image2]: https://user-images.githubusercontent.com/10624937/43851646-d899bf20-9b00-11e8-858c-29b5c2c94ccc.png "Crawler"
 
 
-# Continuous Control with Deep Determinisit Policy Gradient (DDPG)
+# Continuous Control with Deep Deterministic Policy Gradient (DDPG)
 
 ## Introduction
 
